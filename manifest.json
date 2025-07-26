@@ -1,0 +1,20 @@
+{
+  "name": "Test iOS Web App",
+  "short_name": "TestApp",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#222222",
+  "theme_color": "#222222",
+  "icons": [
+    {
+      "src": "cat.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "cat.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
