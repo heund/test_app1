@@ -195,23 +195,40 @@ if (interactiveBtn) interactiveBtn.onclick = () => navigate(showInteractive);
 
 // View Functions
 function showHome() {
+  // Clean up any interactive overlays
+  cleanupInteractiveMode();
+  
   mainView.innerHTML = `
     <h1>Artisan Logic Companion</h1>
-    <p>Select a mode:</p>
+    <p>Choose your experience:</p>
     <div class='mode-buttons'>
-      <button id='narrativeModeBtn'>Narrative Mode</button>
-      <button id='interactiveModeBtn'>Interactive Mode</button>
+      <button id='narrativeModeBtn' class='mode-btn'>Narrative Mode</button>
+      <button id='interactiveModeBtn' class='mode-btn'>Interactive Mode</button>
     </div>
   `;
+  
+  // Remove full-height class
+  mainView.classList.remove('full-height');
+  
+  // Hide navigation buttons
   backBtn.style.display = 'none';
   homeBtn.style.display = 'none';
-  document.getElementById('narrativeModeBtn').onclick = () => navigate(showNarrativeSelect);
-  document.getElementById('interactiveModeBtn').onclick = () => navigate(showInteractive);
+  
+  // Set up mode buttons
+  document.getElementById('narrativeModeBtn').onclick = () => {
+    cleanupInteractiveMode();
+    showNarrativeSelect();
+  };
+  document.getElementById('interactiveModeBtn').onclick = showInteractive;
+  
   // Push home view if navStack is empty
   if (navStack.length === 0) navStack.push({viewFn: showHome, args: []});
 }
 
 function showNarrativeSelect() {
+  // Clean up any interactive overlays
+  cleanupInteractiveMode();
+  
   mainView.innerHTML = `
     <h2>Narrative Mode</h2>
     <p>Select a work:</p>
@@ -227,6 +244,9 @@ function showNarrativeSelect() {
 }
 
 function showNarrative(work) {
+  // Remove full-height class (Narrative mode uses default layout)
+  mainView.classList.remove('full-height');
+  
   // Lorem ipsum content for testing scrollable text
   const narrativeContent = `
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
@@ -284,239 +304,33 @@ function showNarrative(work) {
   homeBtn.style.display = 'inline-block';
 }
 
+// Cleanup function for interactive overlays
+function cleanupInteractiveMode() {
+  // Remove interactive overlays if they exist
+  if (window.currentInteractiveOverlays) {
+    document.body.removeChild(window.currentInteractiveOverlays);
+    window.currentInteractiveOverlays = null;
+  }
+  
+  // Remove full-height class
+  mainView.classList.remove('full-height');
+}
+
 function showInteractive() {
-  mainView.innerHTML = `
-    <h2>Interactive Mode</h2>
-    <div class='interactive-area'>
-      <p>Drag the magnifier to search for the hidden spot. Release to select.</p>
-      <div class='image-container' style='position:relative;width:100%;max-width:90vw;margin:0 auto;'>
-        <canvas id='specCanvas' style='width:100%;height:auto;background:#000;display:block;border-radius:12px;'></canvas>
-        <div id='magnifier' style='display:none;position:absolute;pointer-events:none;border:2px solid #fff;border-radius:50%;box-shadow:0 0 8px #000;background:rgba(0,0,0,0.2);'></div>
-        <div id='resultMsg' style='position:absolute;top:10px;left:50%;transform:translateX(-50%);color:#fff;font-size:1.2em;font-weight:bold;text-shadow:0 0 5px #000;'></div>
-      </div>
-    </div>
-  `;
+  // Clean up any existing interactive overlays first
+  cleanupInteractiveMode();
+  
+  // Show navigation buttons
   backBtn.style.display = 'inline-block';
   homeBtn.style.display = 'inline-block';
-
-  // Responsive canvas setup
-  const canvas = document.getElementById('specCanvas');
-  const ctx = canvas.getContext('2d');
-  const magnifier = document.getElementById('magnifier');
-  const resultMsg = document.getElementById('resultMsg');
-  const img = new window.Image();
   
-  // Setup responsive canvas dimensions
-  function setupCanvas() {
-    const container = canvas.parentElement;
-    const containerWidth = container.clientWidth;
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    
-    // Set canvas size to match container with proper DPR
-    const displayWidth = containerWidth;
-    const displayHeight = displayWidth * (2/3); // 3:2 aspect ratio for better iPad fit
-    
-    canvas.style.width = displayWidth + 'px';
-    canvas.style.height = displayHeight + 'px';
-    
-    // Set actual canvas resolution (accounting for device pixel ratio)
-    canvas.width = displayWidth * devicePixelRatio;
-    canvas.height = displayHeight * devicePixelRatio;
-    
-    // Scale context to match device pixel ratio
-    ctx.scale(devicePixelRatio, devicePixelRatio);
-    
-    return { displayWidth, displayHeight, devicePixelRatio };
+  // Call the interactive mode from interaction.js
+  if (typeof startInteractiveMode === 'function') {
+    startInteractiveMode();
+  } else {
+    console.error('Interactive mode not available - interaction.js may not be loaded');
+    mainView.innerHTML = '<h2>Interactive Mode</h2><p>Loading...</p>';
   }
-  
-  const canvasDimensions = setupCanvas();
-  
-  img.src = 'spec1.png';
-  img.onload = () => {
-    // Draw image to fill canvas while maintaining aspect ratio
-    const imgAspect = img.width / img.height;
-    const canvasAspect = canvasDimensions.displayWidth / canvasDimensions.displayHeight;
-    
-    let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
-    
-    if (imgAspect > canvasAspect) {
-      // Image is wider - fit to height
-      drawHeight = canvasDimensions.displayHeight;
-      drawWidth = drawHeight * imgAspect;
-      offsetX = (canvasDimensions.displayWidth - drawWidth) / 2;
-    } else {
-      // Image is taller - fit to width
-      drawWidth = canvasDimensions.displayWidth;
-      drawHeight = drawWidth / imgAspect;
-      offsetY = (canvasDimensions.displayHeight - drawHeight) / 2;
-    }
-    
-    ctx.clearRect(0, 0, canvasDimensions.displayWidth, canvasDimensions.displayHeight);
-    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-  };
-  
-  let dragging = false, mx = 0, my = 0;
-  // Responsive magnifier size based on canvas size
-  const magRadius = Math.min(canvasDimensions.displayWidth, canvasDimensions.displayHeight) * 0.08; // 8% of smaller dimension
-  const magZoom = 2;
-  
-  // Demo: hidden area - make it proportional to canvas size
-  const hiddenX = canvasDimensions.displayWidth * 0.6;
-  const hiddenY = canvasDimensions.displayHeight * 0.4;
-  const hiddenR = magRadius * 0.6;
-
-  function showMagnifier(x, y) {
-    magnifier.style.display = 'block';
-    magnifier.style.width = magnifier.style.height = magRadius*2 + 'px';
-    magnifier.style.left = (x/canvasDimensions.displayWidth*canvas.offsetWidth-magRadius) + 'px';
-    magnifier.style.top = (y/canvasDimensions.displayHeight*canvas.offsetHeight-magRadius) + 'px';
-    
-    // Redraw the base image with proper aspect ratio
-    const imgAspect = img.width / img.height;
-    const canvasAspect = canvasDimensions.displayWidth / canvasDimensions.displayHeight;
-    
-    let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
-    
-    if (imgAspect > canvasAspect) {
-      drawHeight = canvasDimensions.displayHeight;
-      drawWidth = drawHeight * imgAspect;
-      offsetX = (canvasDimensions.displayWidth - drawWidth) / 2;
-    } else {
-      drawWidth = canvasDimensions.displayWidth;
-      drawHeight = drawWidth / imgAspect;
-      offsetY = (canvasDimensions.displayHeight - drawHeight) / 2;
-    }
-    
-    ctx.clearRect(0, 0, canvasDimensions.displayWidth, canvasDimensions.displayHeight);
-    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-    
-    // Create perfect circular magnified area (no aspect ratio compensation needed)
-    ctx.save();
-    
-    // Create circular clipping path
-    ctx.beginPath();
-    ctx.arc(x, y, magRadius, 0, 2*Math.PI);
-    ctx.clip();
-    
-    // Calculate the source area to magnify
-    const sourceRadius = magRadius / magZoom;
-    const sourceX = x - sourceRadius;
-    const sourceY = y - sourceRadius;
-    const sourceSize = sourceRadius * 2;
-    
-    // Draw the magnified portion
-    const destX = x - magRadius;
-    const destY = y - magRadius;
-    const destSize = magRadius * 2;
-    
-    ctx.drawImage(
-      img,
-      // Source coordinates relative to original image
-      (sourceX - offsetX) * (img.width / drawWidth), 
-      (sourceY - offsetY) * (img.height / drawHeight),
-      sourceSize * (img.width / drawWidth),
-      sourceSize * (img.height / drawHeight),
-      // Destination coordinates on canvas
-      destX, destY, destSize, destSize
-    );
-    
-    ctx.restore();
-    
-    // Draw perfect circular border
-    ctx.save();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(x, y, magRadius, 0, 2*Math.PI);
-    ctx.stroke();
-    ctx.restore();
-  }
-  
-  function hideMagnifier() {
-    magnifier.style.display = 'none';
-    
-    // Redraw the base image with proper aspect ratio
-    const imgAspect = img.width / img.height;
-    const canvasAspect = canvasDimensions.displayWidth / canvasDimensions.displayHeight;
-    
-    let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
-    
-    if (imgAspect > canvasAspect) {
-      drawHeight = canvasDimensions.displayHeight;
-      drawWidth = drawHeight * imgAspect;
-      offsetX = (canvasDimensions.displayWidth - drawWidth) / 2;
-    } else {
-      drawWidth = canvasDimensions.displayWidth;
-      drawHeight = drawWidth / imgAspect;
-      offsetY = (canvasDimensions.displayHeight - drawHeight) / 2;
-    }
-    
-    ctx.clearRect(0, 0, canvasDimensions.displayWidth, canvasDimensions.displayHeight);
-    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-  }
-  
-  function checkFound(x, y) {
-    // Check if (x, y) is inside the hidden circle
-    return Math.sqrt((x-hiddenX)**2 + (y-hiddenY)**2) < hiddenR;
-  }
-  
-  // Get responsive coordinates from touch/mouse events
-  function getCanvasCoordinates(e) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvasDimensions.displayWidth / rect.width;
-    const scaleY = canvasDimensions.displayHeight / rect.height;
-    
-    return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY
-    };
-  }
-  
-  canvas.addEventListener('pointerdown', e => {
-    dragging = true;
-    const coords = getCanvasCoordinates(e);
-    mx = coords.x;
-    my = coords.y;
-    showMagnifier(mx, my);
-  });
-  
-  canvas.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    const coords = getCanvasCoordinates(e);
-    mx = coords.x;
-    my = coords.y;
-    showMagnifier(mx, my);
-  });
-  
-  canvas.addEventListener('pointerup', e => {
-    dragging = false;
-    hideMagnifier();
-    const coords = getCanvasCoordinates(e);
-    mx = coords.x;
-    my = coords.y;
-    if (checkFound(mx, my)) {
-      resultMsg.textContent = 'You found it!';
-    } else {
-      resultMsg.textContent = 'Try again!';
-    }
-    setTimeout(()=>{resultMsg.textContent='';}, 1200);
-  });
-  
-  canvas.addEventListener('pointerleave', e => {
-    dragging = false;
-    hideMagnifier();
-  });
-  
-  // Handle window resize for responsive behavior
-  window.addEventListener('resize', () => {
-    const newDimensions = setupCanvas();
-    Object.assign(canvasDimensions, newDimensions);
-    
-    // Redraw image with new dimensions
-    if (img.complete) {
-      hideMagnifier(); // This will redraw the image
-    }
-  });
 }
 
 // Initialize the app
