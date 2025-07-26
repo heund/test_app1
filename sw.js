@@ -1,12 +1,15 @@
 self.addEventListener('install', function(e) {
   e.waitUntil(
-    caches.open('test-app').then(function(cache) {
+    caches.open('artisan-logic-app').then(function(cache) {
       return cache.addAll([
-        '/',
-        '/index.html',
-        '/manifest.json',
-        '/icon-192.png',
-        '/icon-512.png'
+        './',
+        './index.html',
+        './styles.css',
+        './script.js',
+        './manifest.json',
+        './spec1.png',
+        './audioa.wav',
+        './audiob.wav'
       ]);
     })
   );
