@@ -8,23 +8,107 @@
   <meta name="apple-mobile-web-app-title" content="Artisan Logic Companion">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css">
-  <title>Artisan Logic Companion</title>
+  <link rel="stylesheet" href="style2.css">
+  <title>Exhibition</title>
 </head>
 <body>
-  <nav class="top-nav">
-    <button id="backBtn" style="display:none">&#8592; Back</button>
-    <button id="homeBtn" style="display:none">Home</button>
-  </nav>
+  <div class="icon-bar">
+    <button class="icon-btn back-btn" id="backIcon" title="Back">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="icon-btn dropdown-btn" id="dropdownIcon" title="Audio Player">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M6 9L12 15L18 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="icon-btn menu-btn" id="menuIcon" title="Audio Controls">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="5" cy="12" r="2" fill="white"/>
+        <circle cx="12" cy="12" r="2" fill="white"/>
+        <circle cx="19" cy="12" r="2" fill="white"/>
+      </svg>
+    </button>
+  </div>
   <main id="mainView" class="main-view">
-    <h1>Artisan Logic Companion</h1>
-    <p>Select a mode:</p>
-    <div class="mode-buttons">
-      <button id="narrativeModeBtn">Narrative Mode</button>
-      <button id="interactiveModeBtn">Interactive Mode</button>
-    </div>
+    <!-- Content will be dynamically loaded by JavaScript -->
   </main>
-  <script src="script.js"></script>
+  <!-- Floating Wheel Navigation for Interaction Section -->
+  <div class="wheel-nav-container" id="wheelNavContainer">
+    <!-- Invisible backdrop for click-away functionality -->
+    <div class="wheel-nav-backdrop" id="wheelNavBackdrop"></div>
+    <div class="wheel-nav-trigger" id="wheelNavTrigger">
+      <!-- Just the edge of the wheel peeking out - no icon needed -->
+    </div>
+    <div class="wheel-nav-content" id="wheelNavContent">
+      <div class="wheel-container">
+        <div class="wheel-center" data-tool="refresh">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" stroke="white" stroke-width="2.5" opacity="0.9"/>
+            <path d="M21 3v5h-5" stroke="white" stroke-width="2.5" opacity="0.9"/>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke="white" stroke-width="2.5" opacity="0.9"/>
+            <path d="M8 16H3v5" stroke="white" stroke-width="2.5" opacity="0.9"/>
+          </svg>
+        </div>
+        <div class="wheel-item" data-tool="palette" style="--angle: 0deg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="13.5" cy="6.5" r=".5" fill="white" opacity="0.8"/>
+            <circle cx="17.5" cy="10.5" r=".5" fill="white" opacity="0.8"/>
+            <circle cx="8.5" cy="7.5" r=".5" fill="white" opacity="0.8"/>
+            <circle cx="6.5" cy="12.5" r=".5" fill="white" opacity="0.8"/>
+            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 7.012 17.461 2 12 2z" stroke="white" stroke-width="2" fill="none" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="wheel-item" data-tool="magnify" style="--angle: 45deg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="white" stroke-width="2" opacity="0.8"/>
+            <path d="m21 21-4.35-4.35" stroke="white" stroke-width="2" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="wheel-item" data-tool="filter" style="--angle: 90deg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46 22,3" stroke="white" stroke-width="2" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="wheel-item" data-tool="measure" style="--angle: 135deg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26" stroke="white" stroke-width="2" opacity="0.8"/>
+            <path d="m5 12.5 5 5.5 5-5.5" stroke="white" stroke-width="2" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="wheel-item" data-tool="anomaly" style="--angle: 180deg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M9 21H7l2-4h2l2 4h-2l-1-2z" stroke="white" stroke-width="2" opacity="0.8"/>
+            <path d="M12 3a6 6 0 0 0-6 6c0 2 2 3 2 5h8c0-2 2-3 2-5a6 6 0 0 0-6-6z" stroke="white" stroke-width="2" fill="none" opacity="0.8"/>
+            <path d="M10 17h4" stroke="white" stroke-width="2" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="wheel-item" data-tool="enhance" style="--angle: 225deg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="3" stroke="white" stroke-width="2" opacity="0.8"/>
+            <path d="m12 1-3 6-6-3 3 6-6 3 6 3-3 6 6-3 3 6-3-6 6-3-6-3 3-6-6 3z" stroke="white" stroke-width="2" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="wheel-item" data-tool="export" style="--angle: 270deg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="white" stroke-width="2" opacity="0.8"/>
+            <polyline points="7,10 12,15 17,10" stroke="white" stroke-width="2" opacity="0.8"/>
+            <line x1="12" y1="15" x2="12" y2="3" stroke="white" stroke-width="2" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="wheel-item" data-tool="settings" style="--angle: 315deg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="3" stroke="white" stroke-width="2" opacity="0.8"/>
+            <path d="m12 1-3 6-6-3 3 6-6 3 6 3-3 6 6-3 3 6-3-6 6-3-6-3 3-6-6 3z" stroke="white" stroke-width="2" opacity="0.8"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script2.js"></script>
+  <script src="player.js"></script>
   <script src="interaction.js"></script>
 </body>
 </html>
