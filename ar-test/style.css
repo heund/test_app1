@@ -1,0 +1,17 @@
+body { background: #181818; color: #fff; font-family: system-ui, sans-serif; }
+#instructions {
+  position: absolute;
+  top: 20px;
+  left: 0; right: 0;
+  width: 100vw;
+  text-align: center;
+  z-index: 2;
+  background: rgba(20,20,20,0.7);
+  padding: 1.5em 0.5em;
+  border-radius: 16px;
+  margin: 0 auto;
+  max-width: 420px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+}
+#instructions h2 { font-size: 1.3rem; font-weight: 400; margin-bottom: 0.5em; }
+#instructions p { font-size: 1rem; opacity: 0.8; margin: 0; }
